@@ -1,0 +1,43 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+	{% if users %}
+		<table>
+			<tr>
+				<td>Логин</td>
+				<td>Уровень доступа</td>
+				<td colspan="2">Действия</td>
+			</tr>
+			{% for u in users %}
+			<tr>
+				<td>{{ u.login }}</td>
+				<td>{{ u.level_access }}</td>
+				<td>
+					<a href="/administration/edit/user/{{ u.id }}">Изменить</a>
+				</td>
+				{% if user.level_access > 2 %}
+				<td>
+					<a href="/administration/edit/user/{{ u.id }}">Удалить</a>
+				</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</table>
+		{% if count_page > 1 %}
+			{% for i in 1..count_page %}
+				{% if curent_page == i%}
+					<span>{{ i }}</span>
+				{% else %}
+					<a href="/administration/users/{{ group }}/{{ i }}">{{ i }}</a>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% else %}
+		Список пользователей пуст.
+	{% endif %}
+	<form action="/administration/create/user" method="POST">
+		<input type="hidden" name="level_access" value="{{ level_access }}">
+		<input type="submit" value="Создать">
+	</form>
+		
+{% endblock %}

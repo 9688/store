@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta lang="ru">
+<title>Кофе</title>
+<link rel="stylesheet" type="text/css" href="/static/style.css"/>
+</head>
+<body>
+<div id="container">
+	<header>
+		<div>
+			{% if user.login %}
+				<p>Вы вошли как: {{ user.login }}</p>
+				<form action="/logout" method="POST">
+					<input type="submit" value="Выход">
+				</form>
+			{% else %}
+				<form action="/login" method="POST">
+					<table>
+						<tr>
+							<td>Логин: </td>
+							<td><input type="text" maxlength="25" name="login"></td>
+						</tr>
+						<tr>
+							<td>Пароль: </td>
+							<td><input type="password" name="password"></td>
+						</tr>
+						<tr>
+							<td><a href="/registration">Регистрация</a></td>
+							<td><input type="submit"></td>
+						</tr>
+					</table>
+				</form>
+			{% endif %}
+		</div>
+	</header>
+	<nav id="main">
+		<a href="/">ГЛАВНАЯ</a>
+		<a href="#">КОФЕ</a>
+		<a href="#">ЧАЙ</a>
+		<a href="#">ПОСУДА</a>
+		<a href="#">ОБОРУДОВАНИЕ</a>
+		{% if user.login and user.level_access > 0 %}
+			<a href="/administration">АДМИНКА</a>
+		{% endif %}
+		
+	</nav>
+	<nav id="categories">
+		{% include "categories.html" %}
+	</nav>
+	<article>
+	{% block content %}
+	{% endblock %}
+	</article>
+	<footer>
+		интерентт магазин
+	</footer>
+</div>
+</body>
+</html>

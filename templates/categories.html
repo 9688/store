@@ -1,0 +1,8 @@
+	<ul>
+		<a href="{{ category.link }}">{{ category.name }}</a>
+		{% for category in category.subcaterories %}
+			<li>			
+				{% include "categories.html" %}
+			</li>
+		{% endfor %}
+	</ul>

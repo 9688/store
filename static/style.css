@@ -1,0 +1,37 @@
+#container {
+  margin: 0 auto;
+  width: 80%;
+  min-width: 300px; }
+
+header {
+  border: solid 1px black;
+  background-color: #ffff99;
+  height: 100px; }
+  header div {
+    position: relativ;
+    float: right;
+    display: table-row; }
+
+#main {
+  background-color: #ffffcc;
+  border: solid 1px black;
+  height: 60px;
+  border-radius: 10px 10px 10px 10px; }
+
+#categories {
+  border: solid 1px black;
+  background-color: #cc9900;
+  width: 250px;
+  float: left;
+  height: 100%; }
+
+article {
+  border: solid 1px black;
+  background-color: #ffff66;
+  text-align: jusify;
+  margin: 0;
+  margin-left: 250px;
+  height: 600px; }
+
+footer {
+  background-color: #996600; }

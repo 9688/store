@@ -1,0 +1,49 @@
+{% extends "base.html" %} 
+
+{% macro radioinput(count, postname, name, value, check) %}
+	
+		<input type="radio" name="{{ postname }}" value="{{ value }}" 
+			
+		>{{ name }}<br>
+{% endmacro %}
+
+{% block content %}
+<form action="/registration" method="POST">
+<input type="hidden" name="action" value="register">
+<input type="hidden" name="redirect_to" value={{ redirect_to }}>
+<table>
+	<tr>
+		<td>Логин:</td>
+		<td><input type="text" maxlength="25" name="login" value="{{ login }}" required></td>
+		<td>{{ error.login }}</td>
+	</tr>
+	<tr>
+		<td>Пароль:</td>
+		<td><input type="password" name="password" required></td>
+		<td>{{ error.password }}</td>
+	</tr>
+	<tr>
+		<td>Повторите пароль:</td>
+		<td><input type="password" name="repeatpassword" required></td>
+		<td></td>
+	</tr>
+	{% if user.level_access > 0 %}
+	<tr>
+		<td>Группа:</td>
+		<td>
+			<input type="radio" name="level_access" value="1" {% if level_access < 1 or 1 == level_access %} checked {% endif %}>Покупатель<br/>
+			<input type="radio" name="level_access" value="2" {% if 2 == level_access %} checked {% endif %}>Модератор<br/>
+			{% if user.level_access == 3 %}
+				<input type="radio" name="level_access" value="3" {% if 3 == level_access %} checked {% endif %}>Администратор<br/>
+			{% endif %}
+		</td>
+	</tr>
+	{% endif %}
+	<tr>
+		<td></td>
+		<td><input type="submit" value="Регистрация"></td>
+	</tr>
+	
+</table>
+</form>
+{% endblock %}
