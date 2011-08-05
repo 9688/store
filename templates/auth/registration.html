@@ -8,7 +8,11 @@
 {% endmacro %}
 
 {% block content %}
-<form action="/registration" method="POST">
+{% if action=='create' %}
+	<form action="/administration/create/user" method="POST">
+{% else %} 
+	<form action="/registration" method="POST">
+{% endif %}
 <input type="hidden" name="action" value="register">
 <input type="hidden" name="redirect_to" value={{ redirect_to }}>
 <table>

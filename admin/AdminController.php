@@ -59,11 +59,13 @@ class AdminController extends Controller{
 			'users' => $user_list,
 			'count_page' => $count_page,
 			'curent_page' => $curent_page,
-			'level_access' => $level_access
+			'level_access' => $level_access,
+			'group' => $this->getRequest()->getParam('group')
 		));
 	}
 	
 	public function createUserAction(){
+		$this->getResponce()->setParam('action', 'create');
 		$this->getResponce()->setParam('redirect_to', getenv("HTTP_REFERER"));
 		$this->_forward('registration', 'AuthenticationController', 'auth');
 	}
