@@ -8,13 +8,8 @@
 {% endmacro %}
 
 {% block content %}
-{% if action=='create' %}
-	<form action="/administration/create/user" method="POST">
-{% else %} 
-	<form action="/registration" method="POST">
-{% endif %}
+<form action="/registration" method="POST">
 <input type="hidden" name="action" value="register">
-<input type="hidden" name="redirect_to" value={{ redirect_to }}>
 <table>
 	<tr>
 		<td>Логин:</td>
@@ -23,26 +18,19 @@
 	</tr>
 	<tr>
 		<td>Пароль:</td>
-		<td><input type="password" name="password" required></td>
+		<td><input type="password" name="password" required maxlength="256"></td>
 		<td>{{ error.password }}</td>
 	</tr>
 	<tr>
 		<td>Повторите пароль:</td>
-		<td><input type="password" name="repeatpassword" required></td>
+		<td><input type="password" name="repeatpassword" required maxlength="256"></td>
 		<td></td>
 	</tr>
-	{% if user.level_access > 0 %}
 	<tr>
-		<td>Группа:</td>
-		<td>
-			<input type="radio" name="level_access" value="1" {% if level_access < 1 or 1 == level_access %} checked {% endif %}>Покупатель<br/>
-			<input type="radio" name="level_access" value="2" {% if 2 == level_access %} checked {% endif %}>Модератор<br/>
-			{% if user.level_access == 3 %}
-				<input type="radio" name="level_access" value="3" {% if 3 == level_access %} checked {% endif %}>Администратор<br/>
-			{% endif %}
-		</td>
+		<td>E-mail</td>
+		<td><input type="text" name="email" maxlength="256"></td>
+		<td>{{ error.email }}</td>
 	</tr>
-	{% endif %}
 	<tr>
 		<td></td>
 		<td><input type="submit" value="Регистрация"></td>

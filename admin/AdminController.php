@@ -66,8 +66,14 @@ class AdminController extends Controller{
 	
 	public function createUserAction(){
 		$this->getResponce()->setParam('action', 'create');
-		$this->getResponce()->setParam('redirect_to', getenv("HTTP_REFERER"));
+		$this->getResponce()->setParam('redirect_to', getenv('HTTP_REFERER'));
 		$this->_forward('registration', 'AuthenticationController', 'auth');
+	}
+	
+	public function editUserAction(){
+		$this->getResponce()->setParam('action', 'edit_user');
+		//$this->getResponce()->setParam('redirec_to', getenv('HTTP_REFERER'));
+		$this->_forward('edit', 'ProfileController', 'auth');
 	}
 	
 	public function indexAction(){

@@ -4,6 +4,7 @@ class Model{
 	public $dbh;
 	protected $primary_keys;
 	protected $name_tb;
+	public $id;
 	
 	public function __construct($args = null){
 		$vals = $args;
@@ -16,6 +17,7 @@ class Model{
 				
 		GLOBAL $DB_HEADER;
 		$this->dbh = $DB_HEADER;
+		$this->errors = array();
 		$this->init();
 	}
 	
@@ -53,5 +55,19 @@ class Model{
 			return null;
 			
 		return new User($res[0]);
+	}
+	
+	public function is_valid(){
+		$valid = true;
+		
+		$methods = get_class_methods(get_class($this));
+		
+		foreach(array_keys(get_object_vars($this)) as $key){
+			$method_validate = 'is_valid_'.$key; 
+			if(array_search($method_validate, $methods) !== false && !$this->$method_validate())
+				$valid = false;
+		}
+				
+		return $valid;
 	}
 }

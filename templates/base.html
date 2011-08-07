@@ -11,7 +11,12 @@
 	<header>
 		<div>
 			{% if user.login %}
-				<p>Вы вошли как: {{ user.login }}</p>
+				<p>
+					<img src="{{ user.avatar }}" alt="avatar">
+					Вы вошли как: {{ user.login }}<br>
+					<a href="/edit/profile">Изменить профиль</a>
+				</p>
+				
 				<form action="/logout" method="POST">
 					<input type="submit" value="Выход">
 				</form>

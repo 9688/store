@@ -1,5 +1,6 @@
-#Sat Jul 30 23:18:43 VLAST 2011
+#Sat Aug 06 00:51:52 VLAST 2011
 eclipse.preferences.version=1
 encoding//templates/admin/index.html=UTF-8
+encoding//templates/auth/profile.html=UTF-8
 encoding//templates/auth/registration.html=UTF-8
 encoding/<project>=UTF-8

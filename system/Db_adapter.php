@@ -55,23 +55,23 @@ class Db_adapter {
 		return $this->connection;
 	}
 	
-	function fetchAll($query, $param) {
+	function fetchAll($query, $param=null) {
 		return $this->fetch ( $query, $param, $this->fetchmode );
 	}
 	
-	function fetchAssoc($query, $param) {
+	function fetchAssoc($query, $param=null) {
 		return $this->fetch ( $query, $param, Db_adapter::FETCH_ASSOC );
 	
 	}
 	
-	function fetchCol($query, $param) {
+	function fetchCol($query, $param=null) {
 		$res = $this->fetch ( $query, $param, Db_adapter::FETCH_COLUMN );
 		$keys = array_keys ( $res );
 		
 		return $res [$keys [0]];
 	}
 	
-	function fetchRow($query, $param) {
+	function fetchRow($query, $param=null) {
 		$res = $this->fetch ( $query, $param, $this->fetchmode );
 		$keys = array_keys ( $res );
 		
@@ -80,6 +80,8 @@ class Db_adapter {
 	
 	private function query($query, $param){
 		$this->init();
+		if($param == null)
+			$param = array();
 		
 		$sth = $this->connection->prepare($query);
 		$sth->execute($param);
@@ -87,7 +89,7 @@ class Db_adapter {
 		return $sth;
 	}
 	
-	private function fetch($query, $param, $fetchmode) {
+	public function fetch($query, $param=null, $fetchmode) {
 		$sth = $this->query ( $query, $param );
 		$res = $sth->fetchAll ( $this->fetchmode );
 		return $res;

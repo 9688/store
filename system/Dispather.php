@@ -1,5 +1,7 @@
 <?php
 
+require_once 'auth/Profile.php';
+
 class Dispatcher {
 	var $request;
 	var $responce;
@@ -40,11 +42,13 @@ class Dispatcher {
 	
 	function preDispatch(){
 		if($this->request->user->is_authorized()){
+			$this->request->user->profile = Profile::getById($this->request->user->profile_id);
 			$this->responce->setParam(
 				'user',
 				 array(
 				 	'login' => $this->request->user->login,
-				 	'level_access' => $this->request->user->level_access
+				 	'level_access' => $this->request->user->level_access,
+				 	'avatar' => AVATAR_URL.'/'.$this->request->user->profile->avatar
 				 )
 			);
 		}

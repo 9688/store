@@ -16,12 +16,10 @@ class Responce{
 		$this->template = $path;
 	}
 	
-	public function setParams($key, $val = null){
-		if ($val == null && is_array($key))
+	public function setParams($key){
+		if (is_array($key))
 			foreach($key as $k => $v)
 				$this->params[$k] = $v;
-		else
-			$this->params[$key] = $val;
 	}
 	
 	public function setParam($key, $val){

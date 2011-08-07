@@ -37,7 +37,7 @@ class Router {
 		while ( is_array ( $next_p ) ) {
 			foreach ( $next_p as $key => $val ) {
 				$find = false;
-				$k = ereg_replace(':[A-Za-z0-9]+<', '(', $key);
+				$k = ereg_replace(':['.CONTENTS_OF_THE_PARAM_NAME.']+<', '(', $key);
 				$k = ereg_replace('>', ')', $k);
 				
 				//$k = ereg_replace ( $reg_src_arg, $reg_dest_arg, $key );
@@ -57,7 +57,7 @@ class Router {
 		
 		ereg ( $pattern, $url, $vals );
 		$keys = array();
-		preg_match_all( '/:([A-Za-z0-9]+)/', $pattern_p, $keys );
+		preg_match_all( '/:(['.CONTENTS_OF_THE_PARAM_NAME.']+)/', $pattern_p, $keys );
 		$keys = $keys[1];
 		ereg ( "$reg_dest_arg/$", $url, $action );
 		

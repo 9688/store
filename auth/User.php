@@ -1,4 +1,6 @@
 ﻿<?php
+
+require_once 'auth/Profile.php';
 class User extends Model{
 	const ADMIN = 3;
 	const MODER = 2;
@@ -6,24 +8,21 @@ class User extends Model{
 	const ANONYM = 0;
 	const REGISTERED = -1;
 	
-	public $id;
 	public $sid;
 	public $login;
 	public $password;
+	public $email;
 	public $level_access;
-	public $profile;
+	public $profile_id;
 	public $repeatpassword;
 	public $is_auth;
+	public $profile;
 	
 	public function init(){
-		$this->primary_keys = array('id', 'sid', 'login');
-		$this->name_tb = 'users';
 		$this->is_auth = false;
 	}
 	
-	public function is_valid(){
-		$this->errors = array();
-		
+	public function is_valid_login(){
 		if(strlen($this->login) == 0)
 			$this->errors['login'] = 'Поле не должно быть пусто.';
 		elseif(!preg_match('/^[A-Za-z0-9_.-]+$/', $this->login))
@@ -31,30 +30,53 @@ class User extends Model{
 		elseif(strlen($this->login) > 30 || strlen($this->login) < 4)
 			$this->errors['login'] = 'Логин должен быть от 4 до 30 символов.';
 		else{
-			$user = $this->get(array('login' => $this->login));
+			$user = self::getByLogin($this->login);
 			if($user != null)
 				$this->errors['login'] = 'Пользователь с таким логином уже существует.';
 		}
 		
+		return array_key_exists('login', $this->errors) == false;
+	}
+
+	public function is_valid_password(){
 		if(strlen($this->password) == 0)
 			$this->errors['password'] = 'Поле не должно быть пусто.';
 		elseif(strlen($this->password) < 4)
 			$this->errors ['password'] = 'Пароль должен быть не менее 4 символов.';
+		elseif(strlen($this->password) > 256)
+			$this->errors['password'] = 'Пароль не может быть длиннее 256 символов.';
 		elseif(strcmp($this->password, $this->repeatpassword))
 			$this->errors ['password'] = 'Введенные пароли не совпадают';
-			
-		return count($this->errors) == 0;
+		
+		return array_key_exists('password', $this->errors) == false;
+	}
+	
+	public function is_valid_email(){
+		if(strlen($this->email) > 0)
+			if(strlen($this->email) > 256){
+				$this->errors['email'] = 'Поле не может быть длиннее 256 символов.';
+				return false;
+			}elseif(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
+				$this->errors['email'] = 'Неверный e-mail.';
+				return false;
+			}
+		return true;
 	}
 	
 	public function create(){
-		$param = array($this->sid, $this->login, sha1($this->password), $this->level_access);
-		$this->dbh->insert('INSERT INTO users(sid, login, password, level_access) VALUES (?, ?, ?, ?)', $param);
+		$res = $this->dbh->insert(
+			'INSERT INTO users(sid, login, password, level_access, email, profile_id) VALUES (?, ?, ?, ?, ?, ?)',
+			array($this->sid, $this->login, $this->password, $this->level_access, $this->email, $this->profile_id)
+		);
+		
+		$res = $this->dbh->fetchRow('SELECT * FROM users WHERE id=LAST_INSERT_ID()');
+		return $res == null? null: new User($res);
 	}
 	
 	public function save(){
 		$q = 'UPDATE users SET ';
 		$param = array();
-		foreach(array('sid', 'login', 'password', 'level_access', 'data') as $key)
+		foreach(array('sid', 'login', 'password', 'level_access', 'email', 'profile_id') as $key)
 			if($this->$key != null){
 				$q .= $key."=?, ";
 				$param[] = $this->$key;
@@ -87,16 +109,24 @@ class User extends Model{
 		}
 	}
 	
-	public function getByLogin(){
-		$res = $this->dbh->fetchRow(
-			'SELECT * FROM users WHERE login=?',
-			array($this->login)
-		);
+	public static function getByLogin($login){
+		GLOBAL $DB_HEADER;
+		$res = $DB_HEADER->fetchRow('SELECT * FROM users WHERE login=?', array($login));
 		
-		if($res == null)
-			return null;
+		return $res == null? null: new User($res);
+	}
+	
+	public static function getById($id){
+		GLOBAL $DB_HEADER;
+		$res = $DB_HEADER->fetchRow('SELECT * FROM users WHERE id=?', array($id));
+		if($res != null){
+			$profile = Profile::getById($res['profile_id']);
+			$user = new User($res);
+			$user->profile = $profile;
+			return $user;
+		}
 		else
-			return new User($res);
+			return null;
 	}
 	
 	public static function getListFromAccess($level_access){
