@@ -102,4 +102,8 @@ class Db_adapter {
 	function update($query, $param) {
 		$this->query ( $query, $param );
 	}
+	
+	function delete($query, $param){
+		$this->query($query, $param);
+	}
 }

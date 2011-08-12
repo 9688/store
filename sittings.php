@@ -27,5 +27,8 @@ define ( 'MEDIA_URL' , '/media');
 define ( 'AVATAR_DIR', '/avatars' );
 define ( 'AVATAR_URL', MEDIA_URL.'/avatars');
 
+define ( 'MAX_SIZE_AVATAR', 20 );
+define ( 'DEFAULT_AVATAR', '');
+
 define ( 'HTTP_404', '/404');
 

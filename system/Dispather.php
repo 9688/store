@@ -46,6 +46,7 @@ class Dispatcher {
 			$this->responce->setParam(
 				'user',
 				 array(
+				 	'id' => $this->request->user->id,
 				 	'login' => $this->request->user->login,
 				 	'level_access' => $this->request->user->level_access,
 				 	'avatar' => AVATAR_URL.'/'.$this->request->user->profile->avatar

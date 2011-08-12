@@ -23,7 +23,9 @@ $url = array(
 				'$' => new Action('admin_AdminController', 'index'),
 				'/users/:group<[A-Za-z]+>/:page<[0-9]+>$' => new Action('admin_AdminController', 'showListUsers'),
 				'/create/user' => new Action('admin_AdminController', 'createUser'),
-				'/edit/user/:user_id<[0-9]+>$' => new Action('admin_AdminController', 'editUser')
+				'/edit/user/:user_id<[0-9]+>$' => new Action('admin_AdminController', 'editUser'),
+				'/delete/user/:user_id<[0-9]+>$' => new Action('admin_AdminController', 'deleteUser'),
+				'/info/user/:user_id<[0-9]+>$' => new Action('admin_AdminController', 'showUserInfo')
 			),
 	'404$' => new Action('errorController', 'notFound')
 );

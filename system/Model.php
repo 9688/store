@@ -1,10 +1,10 @@
 <?php
 class Model{
 	public $errors;
-	public $dbh;
-	protected $primary_keys;
+	public $dbh = null;
+	protected $fields;
 	protected $name_tb;
-	public $id;
+	public $id = null;
 	
 	public function __construct($args = null){
 		$vals = $args;
@@ -21,7 +21,33 @@ class Model{
 		$this->init();
 	}
 	
-	public function init(){
+	protected function init(){
+	}
+	
+	public function create(){
+		$q = 'INSERT INTO '.$this->name_tb.'(';
+		$qe = ' VALUES(';	
+		$param = array();
+		foreach($this->fields as $key){
+			if($this->$key == null)
+				$param[] = '';
+			else 
+				$param[] = $this->$key; 
+			
+			$q .= $key.', ';
+			$qe .= '?, ';
+		}
+		
+		$q = substr($q, 0, strlen($q) - 2).')'.substr($qe, 0, strlen($qe) - 2).')';
+		$this->dbh->insert($q, $param);
+		$res = $this->dbh->fetchRow('SELECT * FROM '.$this->name_tb.' WHERE id=LAST_INSERT_ID()');
+		
+		if($res == null)
+			errorController::addError('INSER INTO '.$this->name_tb.' FAIL');
+		else{
+			$class = get_class($this);
+			return new $class($res);
+		}
 	}
 	
 	public function query($param = null){
