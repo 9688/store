@@ -20,6 +20,8 @@ class User extends Model{
 	
 	public function init(){
 		$this->is_auth = false;
+		$this->fields = array('sid', 'login', 'password', 'level_access', 'email', 'profile_id');
+		$this->name_tb = 'users';
 	}
 	
 	public function is_valid_login(){
@@ -63,15 +65,16 @@ class User extends Model{
 		return true;
 	}
 	
-	public function create(){
+	/*public function create(){
 		$res = $this->dbh->insert(
 			'INSERT INTO users(sid, login, password, level_access, email, profile_id) VALUES (?, ?, ?, ?, ?, ?)',
 			array($this->sid, $this->login, $this->password, $this->level_access, $this->email, $this->profile_id)
 		);
 		
 		$res = $this->dbh->fetchRow('SELECT * FROM users WHERE id=LAST_INSERT_ID()');
+		
 		return $res == null? null: new User($res);
-	}
+	}*/
 	
 	public function save(){
 		$q = 'UPDATE users SET ';
@@ -127,6 +130,12 @@ class User extends Model{
 		}
 		else
 			return null;
+	}
+	
+	public function delete(){
+		$this->dbh->delete('DELETE FROM users, profiles USING users INNER JOIN profiles ON
+		 	profiles.id=users.id WHERE users.id=?',
+			array($this->id));
 	}
 	
 	public static function getListFromAccess($level_access){

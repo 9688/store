@@ -1,7 +1,7 @@
 <?php
 require_once 'auth/User.php';
 
-define('COUNT_USERS_ON_PAGE', 10);
+define('COUNT_USERS_ON_PAGE', 4);
 
 class AdminController extends Controller{
 	
@@ -65,15 +65,177 @@ class AdminController extends Controller{
 	}
 	
 	public function createUserAction(){
-		$this->getResponce()->setParam('action', 'create');
-		$this->getResponce()->setParam('redirect_to', getenv('HTTP_REFERER'));
-		$this->_forward('registration', 'AuthenticationController', 'auth');
+		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access <= User::BUYER)
+			$this->_redirect('/');
+		
+		$this->getResponce()->setTemplate('admin/create_user.html');
+		
+		if($this->getRequest()->getParam('action') == 'create'){
+			$error = array();
+			
+			$user = new User($this->getRequest());
+			$profile = new Profile($this->getRequest());
+			
+			if($this->getRequest()->user->level_access < User::ADMIN)
+				$user->level_access = User::BUYER;
+				
+			if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name'])){
+				$res = validate_file($this->getRequest()->FILES['avatar'], MAX_SIZE_AVATAR);
+				if($res !== true)
+					$error['avatar'] = $res;
+			}
+				
+			if(!$user->is_valid())
+				$error = array_merge($error, $user->errors);
+				
+			if(!$profile->is_valid())
+				$error = array_merge($error, $profile->errors);
+			
+			if(count($error) == 0){
+				if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name']))
+					$profile->avatar = upload($this->getRequest()->FILES['avatar'], null, AVATAR_DIR);
+				else
+					$profile->avatar = DEFAULT_AVATAR;
+
+				$profile = $profile->create();
+				$user->profile_id = $profile->id;
+				$user->password = sha1($user->password);
+				$user->create();
+				$this->getResponce()->setTemplate('msg.html');
+				$this->getResponce()->setParam('text', 'Пользователь успешно создан.');
+			}
+			else{
+				$this->getResponce()->setParams($this->getRequest()->getParams());
+				$this->getResponce()->setParam('error', $error);	
+			}
+		}
+		else
+			$this->getResponce()->setParams($this->getRequest()->getParams());
 	}
 	
 	public function editUserAction(){
-		$this->getResponce()->setParam('action', 'edit_user');
-		//$this->getResponce()->setParam('redirec_to', getenv('HTTP_REFERER'));
-		$this->_forward('edit', 'ProfileController', 'auth');
+		
+		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access < User::MODER ||
+		$this->getRequest()->user->id == $this->getRequest()->getParam('user_id'))
+			$this->_redirect('/');
+		
+		$user = User::getById($this->getRequest()->getParam('user_id'));
+		if($user == null){
+			$this->getResponce()->setTemplate('msg.html');
+			$this->getResponce()->setParam('text', 'Данный пользователь не существует.');
+			return;
+		}
+		
+		$profile = $user->profile;
+			
+		$this->getResponce()->setTemplate('admin/edit_user_profile.html');
+			
+		if($this->getRequest()->getParam('action') == 'edit'){
+			$error = array();
+			
+			$newprofile = new Profile($this->getRequest());
+			$u = new User($this->getRequest());
+			$post = $this->getRequest()->POST;
+			
+			if($u->level_access < User::BUYER || $u->level_access > User::ADMIN){
+				$this->_redirect('/');
+				return;
+			}
+			
+			if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name'])){
+				$res = validate_file($this->getRequest()->FILES['avatar'], MAX_SIZE_AVATAR);
+				if($res !== true)
+					$error['avatar'] = $res;
+			}
+				
+			if(!$u->is_valid())
+				$error = array_merge($error, $user->errors);
+				
+			if($post['new_password'] != null || $post['repeat_new_password'] != null){
+					$u = new User(array(
+							'password' => $this->getRequest()->POST['new_password'],
+							'repeatpassword' => $this->getRequest()->POST['new_repeat_password']
+						));
+						
+					if(!$u->is_valid_password())
+						$error['new_password'] = $u->errors['password'];
+					else
+						$u->password = sha1($u->password);
+			}
+				
+			if(!$newprofile->is_valid())
+				$error = array_merge($error, $newprofile->errors);
+				
+			if(count($error) == 0){
+				if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name'])){
+					$newprofile->avatar = upload($this->getRequest()->FILES['avatar'], null, AVATAR_DIR);
+					if($profile->avatar != null && Profile::getCountProfilesLinkingToAvatar($profile->avatar) == 1)
+						unlink(MEDIA_ROOT.AVATAR_DIR.'/'.$profile->avatar);
+				}
+				else
+					$newprofile->avatar = $profile->avatar;
+					
+				$newprofile->id = $profile->id;
+				$newprofile->save();
+				$user->password = $u->password;
+				$user->level_access = $u->level_access;
+				$user->save();
+				$this->getResponce()->setTemplate('msg.html');
+				$this->getResponce()->setParam('text', 'Данные пользователя успешно изменены.');
+			}
+			else{
+				$this->getResponce()->setParams(array_merge(
+					$this->getRequest()->getParams(),
+					array('error' => $error, 'id' => $user->id))
+				);
+			}
+		}
+		else{
+			$this->getResponce()->setParams(array_merge(
+				get_object_vars($profile),
+				get_object_vars($user)
+			));
+		}
+		
+		$this->getResponce()->setParam('avatar', AVATAR_URL.'/'.$profile->avatar);
+	}
+	
+	public function deleteUserAction(){
+		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access <= User::BUYER ||
+		$this->getRequest()->getParam('user_id') == null)
+			$this->_redirect('/');
+
+		if($this->getRequest()->user->id == $this->getRequest()->getParam('user_id'))
+			$this->_redirect('/');
+			
+		$user = User::getById($this->getRequest()->getParam('user_id'));
+		$this->getResponce()->setTemplate('msg.html');
+		
+		if($user == null)
+			$this->getResponce()->setParam('text', 'Данный пользователь не существует.');
+		else{
+			$user->delete();
+			$this->getResponce()->setParam('text', 'Пользователь успешно удален.');	
+		}
+	}
+	
+	public function showUserInfoAction(){
+		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access < User::MODER)
+			$this->_redirect('/');
+			
+		$user = User::getById($this->getRequest()->getParam('user_id'));
+		
+		
+		if($user == null){
+			$this->getResponce()->setTemplate('msg.html');
+			$this->getResponce()->setParam('text', 'Данный пользователь не существует.');
+		}
+		else{
+			$profile = $user->profile;
+			$profile->avatar = AVATAR_URL.'/'.$profile->avatar;
+			$this->getResponce()->setTemplate('admin/user.html');
+			$this->getResponce()->setParams(array_merge(get_object_vars($user), get_object_vars($profile)));	
+		}
 	}
 	
 	public function indexAction(){

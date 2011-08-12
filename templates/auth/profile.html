@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if not action or action == 'edit' %}
+<form action="/edit/profile" method="POST" enctype="multipart/form-data">
+{% elseif action == 'fill_profile' %}
+<form action="/registration" method="POST" enctype="multipart/form-data">
+{% endif %}
+	<input type="hidden" name="action" value="{{ action|default('edit') }}">
+	
+	<table>
+	{% include "forms/profile.html" %}
+	{% if not action or action == 'edit' %}
+		<tr>
+			<td>Текущий пароль: </td>
+			<td><input type="password" name="password" maxlength="256"></td>
+			<td>{{ error.password }}</td>
+		</tr>
+		<tr>
+			<td>Новый пароль: </td>
+			<td><input type="password" name="new_password" maxlength="256"></td>
+			<td>{{ error.new_password }}</td>
+		</tr>
+		<tr>
+			<td>Повторите пароль: </td>
+			<td><input type="password" name="repeat_new_password" maxlength="256"></td>
+			<td></td>
+		</tr>
+	{% endif %}
+	</table>
+	<input type="submit" value="Сохранить">
+</form>
+{% endblock %}

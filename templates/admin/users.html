@@ -14,14 +14,15 @@
 			<tr>
 				<td>{{ u.login }}</td>
 				<td>{{ u.level_access }}</td>
-				{% if user.level_access >= u.level_access %}
+				<td><a href="/administration/info/user/{{u.id }}">Подробнее</a></td>
+				{% if user.level_access > u.level_access %}
 				<td>
 					<a href="/administration/edit/user/{{ u.id }}">Изменить</a>
 				</td>
 				{% endif %}
-				{% if user.level_access > u.level_access %}
+				{% if (user.level_access > u.level_access or user.level_access == 3) and u.id != user.id %}
 				<td>
-					<a href="/administration/edit/user/{{ u.id }}">Удалить</a>
+					<a href="/administration/delete/user/{{ u.id }}">Удалить</a>
 				</td>
 				{% endif %}
 			</tr>
@@ -29,7 +30,7 @@
 		</table>
 		{% if count_page > 1 %}
 			{% for i in 1..count_page %}
-				{% if curent_page == i%}
+				{% if curent_page == i %}
 					<span>{{ i }}</span>
 				{% else %}
 					<a href="/administration/users/{{ group }}/{{ i }}">{{ i }}</a>

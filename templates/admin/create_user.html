@@ -1,0 +1,31 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+
+<form action="/administration/create/user" method="POST" enctype="multipart/form-data">
+<table>
+	<input type="hidden" name="action" value="create">
+	{% include "forms/registration.html" %}
+	{% if user.level_access == 3 %}
+	<tr>
+		<td>
+			Покупатель: <input type="radio" name="level_access" value="1" {% if level_access != -1 %}
+																				{%if level_access == 1 %}checked{% endif %}
+																		  {% else %}
+																		  		 checked 
+																		  {% endif %}><br>
+			Модератор: <input type="radio" name="level_access" value="2" {% if level_access == 2 %}checked{% endif %}><br>
+			Администратор: <input type="radio" name="level_access" value="3" {% if level_access == 3 %}checked{% endif %}>
+		</td>
+	</tr>
+	{% endif %} 
+	{% include "forms/profile.html" %}
+	<tr>
+		<td><input type="submit" value="Создать"></td>
+		<td></td>
+		<td></td>
+	</tr>
+	
+</table> 
+</form>
+{% endblock %}

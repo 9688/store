@@ -46,7 +46,7 @@
 		<a href="#">ЧАЙ</a>
 		<a href="#">ПОСУДА</a>
 		<a href="#">ОБОРУДОВАНИЕ</a>
-		{% if user.login and user.level_access > 0 %}
+		{% if user.login and user.level_access > 1 %}
 			<a href="/administration">АДМИНКА</a>
 		{% endif %}
 		

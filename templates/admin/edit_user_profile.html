@@ -1,0 +1,36 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<p>
+	Пользователь: {{ login }}<br>
+	<image src="{{ avatar }}"/>
+</p>
+<form action="/administration/edit/user/{{ id }}" method="POST" enctype="multipart/form-data">
+	<input type="hidden" name="action" value="edit">
+	<table>
+		{% if user.level_access  == 3 %}
+		<tr>
+			<td>Права доступа: </td>
+			<td>
+				Покупатель: <input type="radio" name="level_access" value="1" {% if not level_access or level_access == 1 %}checked{% endif %}><br>
+				Модератор: <input type="radio" name="level_access" value="2" {% if level_access == 2 %}checked{% endif %}><br>
+				Администратор: <input type="radio" name="level_access" value="3" {% if level_access == 3 %}checked{% endif %}>
+			</td>
+			<td></td>
+		</tr>
+		{% endif %}
+		<tr>
+			<td>Новый пароль: </td>
+			<td><input type="password" name="new_password" maxlength="256"></td>
+			<td>{{ error.new_password }}</td>
+		</tr>
+		<tr>
+			<td>Повторите пароль: </td>
+			<td><input type="password" name="repeat_new_password" maxlength="256"></td>
+			<td></td>
+		</tr>
+		{% include 'forms/profile.html' %}
+	</table>
+	<input type="submit" value="Сохранить">
+</form>
+{% endblock %}

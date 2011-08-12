@@ -4,13 +4,12 @@ require_once 'auth/User.php';
 
 class AuthenticationController extends Controller{
 	
-	public function registrationAction(){
-		$this->getResponce()->setTemplate('auth/registration.html');
-		
-		
+	public function registrationAction(){	
 		if($this->getRequest()->user->is_authorized())
 			$this->_redirect('/');
 		
+		$this->getResponce()->setTemplate('auth/registration.html');
+				
 		$user = new User($this->getRequest()->getParams());
 		
 		if($this->getRequest()->getParam('action') == 'register'){
@@ -18,25 +17,23 @@ class AuthenticationController extends Controller{
 				$user->level_access = User::BUYER;
 				$user->password = sha1($user->password);
 				
-				$profile = new Profile();
+				$profile = new Profile(array('avatar' => DEFAULT_AVATAR));
 				$profile = $profile->create();
 				$user->profile_id = $profile->id;
 				$user = $user->create();
-				
+
 				session_start();
 				$_SESSION['user_id'] = $user->id;
-				
 				$this->getResponce()->setTemplate('auth/profile.html');
-				$this->getResponce()->setParam('action', 'fill_profile');
+				$this->getResponce()->setParam('action', 'fill_profile');				
 			}
 			else{
 				$this->getResponce()->setParam('error', $user->errors);
 				$this->getResponce()->setParams($this->getRequest()->getParams());
-			}
+			}		
 		}
-		elseif($this->getRequest()->getParam('action') == 'fill_profile'){
+		elseif($this->getRequest()->getParam('action') == 'fill_profile')
 			$this->_forward('fill', 'ProfileController');
-		}
 	}
 	
 	public function loginAction(){

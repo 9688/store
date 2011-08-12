@@ -11,26 +11,7 @@
 <form action="/registration" method="POST">
 <input type="hidden" name="action" value="register">
 <table>
-	<tr>
-		<td>Логин:</td>
-		<td><input type="text" maxlength="25" name="login" value="{{ login }}" required></td>
-		<td>{{ error.login }}</td>
-	</tr>
-	<tr>
-		<td>Пароль:</td>
-		<td><input type="password" name="password" required maxlength="256"></td>
-		<td>{{ error.password }}</td>
-	</tr>
-	<tr>
-		<td>Повторите пароль:</td>
-		<td><input type="password" name="repeatpassword" required maxlength="256"></td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>E-mail</td>
-		<td><input type="text" name="email" maxlength="256"></td>
-		<td>{{ error.email }}</td>
-	</tr>
+	{% include "forms/registration.html" %}
 	<tr>
 		<td></td>
 		<td><input type="submit" value="Регистрация"></td>
