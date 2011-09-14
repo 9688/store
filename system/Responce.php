@@ -16,14 +16,14 @@ class Responce{
 		$this->template = $path;
 	}
 	
-	public function setParams($key){
-		if (is_array($key))
-			foreach($key as $k => $v)
-				$this->params[$k] = $v;
+	public function setParams($args){
+		if (is_array($args))
+			foreach($args as $k => $v)
+				array_push_by_creative_key($this->params, $k, $v, true);
 	}
 	
 	public function setParam($key, $val){
-		$this->params[$key] = $val;
+		array_push_by_creative_key($this->params, $key, $val, true);
 	}
 	
 	public function send(){

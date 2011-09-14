@@ -1,0 +1,46 @@
+{% extends "index.html" %}
+
+{% block content %}
+<form action="/my_cart/order" method="POST">
+	{% if error %}
+	<span class="error">Заполните обязательные поля *</span>
+	{% endif %}
+	<table>
+		<tr>
+			<td>*Имя: </td>
+			<td><input type="text" maxlength="256" name="first_name" value="{{ addres.first_name }}"></td>
+		</tr>
+		<tr>
+			<td>*Отчество: </td>
+			<td><input type="text" maxlength="256" name="middle_name" value="{{ addres.middle_name }}"></td>
+		</tr>
+		<tr>
+			<td>*Фамилия</td>
+			<td><input type="text" maxlength="256" name="last_name" value="{{ addres.last_name }}"></td>
+		</tr>
+		<tr>
+			<td>*Страна: </td>
+			<td><input type="text" maxlength="256" name="country" value="{{ addres.country }}"></td>
+		</tr>
+		<tr>
+			<td>*Город: </td>
+			<td><input type="text" maxlength="256" name="city" value="{{ addres.city }}"></td>
+		</tr>
+		<tr>
+			<td>*Улица: </td>
+			<td><input type="text" maxlength="256" name="street" value="{{ addres.street }}"></td>
+		</tr>
+		<tr>
+			<td>*Дом: </td>
+			<td><input type="text" maxlength="256" name="house_number" value="{{ addres.house_number }}"></td>
+		</tr>
+		<tr>
+			<td>*Квартира: </td>
+			<td><input type="text" maxlength="256" name="apartament_number" value="{{ addres.apartament_number }}"></td>
+		</tr>
+	</table>
+	<label class="info">* - поля обязательные для заполнения.</label>
+	<input type="hidden" value="to_order" name="action">
+	<input type="submit" value="Оформить заказ">
+</form>
+{% endblock %}

@@ -23,7 +23,7 @@ class Request {
 		$this->COOKIE = $cookies;
 		$this->SESSION = $session;
 		$this->ENV = $env;
-		$this->PARAMS = array_merge ( $post, $get );
+		$this->PARAMS = $post + $get;
 		$this->processed = false;
 		$this->user = null;
 	}
@@ -69,8 +69,11 @@ class Request {
 		$this->PARAMS [$key] = $val;
 	}
 	
-	public function getParam($key) {
-		return $this->PARAMS [$key];
+	public function getParam($key, $val=null) {
+		if($this->PARAMS[$key] === null)
+			return $val;
+		else
+			return $this->PARAMS[$key];
 	}
 	
 	public function setParams($arg) {

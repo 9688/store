@@ -1,0 +1,35 @@
+	<ul>
+		{% for category in category.subcategories %}
+			<li>
+				<table id="tree_categories">
+					<tr>
+						<td>
+							<span>{{ category.id }}</span>
+							<a href="/administration/products{{ category.link }}/1">{{ category.name }}</a>
+						</td>
+						<td>
+							<form action="/administration/create/categoty" method="POST">
+								<input type="submit" value="Добавить">
+								<input type="hidden" name="parent" value="{{ category.id }}">
+							</form>
+						</td>
+						{% if category.id != 1 %}
+						<td>
+							<form action="/administration/edit/category" method="POST">
+								<input type="submit" value="Изменить">
+								<input type="hidden" name="id" value="{{ category.id }}">
+							</form>
+						</td>
+						<td>
+							<form action="/administration/delete/category" method="POST">
+								<input type="submit" value="Удалить">
+								<input type="hidden" name="id" value="{{ category.id }}">
+							</form>
+						</td>
+						{% endif %}
+					</tr>
+				</table>
+				{% include "admin/tree_categories.html" %}
+			</li>
+		{% endfor %}
+	</ul>

@@ -35,6 +35,7 @@ class ProfileController extends Controller{
 			session_destroy();
 			return;
 		}
+		$this->_forward('initPage', 'IndexController', '');
 	}
 	
 	public function edit($profile, $param, &$error){
@@ -55,7 +56,7 @@ class ProfileController extends Controller{
 				$newprofile->avatar = upload($param['avatar'], null, AVATAR_DIR);
 				resizeImg($newprofile->avatar, AVATAR_DIR, 50, 50);
 				
-				if($profile->avatar != null && Profile::getCountProfilesLinkingToAvatar($profile->avatar) == 1)
+				if($profile->avatar !== $newprofile->avatar && Profile::getCountProfilesLinkingToAvatar($profile->avatar) == 1)
 					unlink(MEDIA_ROOT.AVATAR_DIR.'/'.$profile->avatar);
 			}
 			else
@@ -63,7 +64,7 @@ class ProfileController extends Controller{
 				
 			$newprofile->save();
 			if($this->getRequest()->getParam('action') == 'edit')
-				$this->getResponce()->params['user']['avatar'] = AVATAR_URL.'/'.$newprofile->avatar;
+				$this->getResponce()->setParam('user.avatar', AVATAR_URL.'/'.$newprofile->avatar);
 			return true;
 		}
 		else
@@ -74,7 +75,7 @@ class ProfileController extends Controller{
 		$this->getResponce()->setTemplate('auth/profile.html');
 		
 		if(!$this->getRequest()->user->is_authorized()){
-			$this->_redirect('/');
+			$this->_redirect('/error_404');
 			return;
 		}
 		
@@ -85,7 +86,7 @@ class ProfileController extends Controller{
 		
 		if($this->getRequest()->getParam('action') == 'edit'){
 			$post = $this->getRequest()->POST;
-			if($post['password'] != null || $post['new_password'] != null || $post['repeat_new_password'] != null)
+			if(strlen($post['password']) || strlen($post['new_password']) || strlen($post['repeat_new_password']))
 				if(sha1($this->getRequest()->POST['password']) === $user->password){
 					$u = new User(array(
 							'password' => $this->getRequest()->POST['new_password'],
@@ -105,8 +106,7 @@ class ProfileController extends Controller{
 			if(count($error) == 0){
 				$user->password = $u->password;
 				$user->save();
-				$this->getResponce()->setTemplate('msg.html');
-				$this->getResponce()->setParam('text', 'Профиль успешно сохранен.');
+				$this->_redirect('/');
 			}
 			else 
 				$this->getResponce()->setParams(array_merge(
@@ -116,6 +116,8 @@ class ProfileController extends Controller{
 		}
 		else
 			$this->getResponce()->setParams(get_object_vars($profile));
+
+		$this->_forward('initPage', 'IndexController', '');
 	}
 }	
 	

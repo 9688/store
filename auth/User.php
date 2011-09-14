@@ -1,6 +1,8 @@
 ﻿<?php
 
 require_once 'auth/Profile.php';
+require_once 'category/Comments.php';
+
 class User extends Model{
 	const ADMIN = 3;
 	const MODER = 2;
@@ -13,6 +15,7 @@ class User extends Model{
 	public $password;
 	public $email;
 	public $level_access;
+	public $rating = 0;
 	public $profile_id;
 	public $repeatpassword;
 	public $is_auth;
@@ -20,62 +23,43 @@ class User extends Model{
 	
 	public function init(){
 		$this->is_auth = false;
-		$this->fields = array('sid', 'login', 'password', 'level_access', 'email', 'profile_id');
+		$this->fields = array('sid', 'login', 'password', 'level_access', 'email', 'profile_id', 'rating');
 		$this->name_tb = 'users';
 	}
 	
 	public function is_valid_login(){
 		if(strlen($this->login) == 0)
-			$this->errors['login'] = 'Поле не должно быть пусто.';
+			return 'Поле не должно быть пусто.';
 		elseif(!preg_match('/^[A-Za-z0-9_.-]+$/', $this->login))
-			$this->errors['login'] = 'Допускаются только латинские буквы (a-z), цифры(0-9), точка(.), минус(-) и знак подчеркивания(_).';
+			return 'Допускаются только латинские буквы (a-z), цифры(0-9), точка(.), минус(-) и знак подчеркивания(_).';
 		elseif(strlen($this->login) > 30 || strlen($this->login) < 4)
-			$this->errors['login'] = 'Логин должен быть от 4 до 30 символов.';
+			return 'Логин должен быть от 4 до 30 символов.';
 		else{
 			$user = self::getByLogin($this->login);
 			if($user != null)
-				$this->errors['login'] = 'Пользователь с таким логином уже существует.';
+				return 'Пользователь с таким логином уже существует.';
 		}
-		
-		return array_key_exists('login', $this->errors) == false;
 	}
 
 	public function is_valid_password(){
 		if(strlen($this->password) == 0)
-			$this->errors['password'] = 'Поле не должно быть пусто.';
+			return 'Поле не должно быть пусто.';
 		elseif(strlen($this->password) < 4)
-			$this->errors ['password'] = 'Пароль должен быть не менее 4 символов.';
+			return 'Пароль должен быть не менее 4 символов.';
 		elseif(strlen($this->password) > 256)
-			$this->errors['password'] = 'Пароль не может быть длиннее 256 символов.';
+			return 'Пароль не может быть длиннее 256 символов.';
 		elseif(strcmp($this->password, $this->repeatpassword))
-			$this->errors ['password'] = 'Введенные пароли не совпадают';
-		
-		return array_key_exists('password', $this->errors) == false;
+			return 'Введенные пароли не совпадают';
 	}
 	
 	public function is_valid_email(){
 		if(strlen($this->email) > 0)
-			if(strlen($this->email) > 256){
-				$this->errors['email'] = 'Поле не может быть длиннее 256 символов.';
-				return false;
-			}elseif(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
-				$this->errors['email'] = 'Неверный e-mail.';
-				return false;
-			}
-		return true;
+			if(strlen($this->email) > 256)
+				return 'Поле не может быть длиннее 256 символов.';
+			elseif(!filter_var($this->email, FILTER_VALIDATE_EMAIL))
+				return 'Неверный e-mail.';
 	}
-	
-	/*public function create(){
-		$res = $this->dbh->insert(
-			'INSERT INTO users(sid, login, password, level_access, email, profile_id) VALUES (?, ?, ?, ?, ?, ?)',
-			array($this->sid, $this->login, $this->password, $this->level_access, $this->email, $this->profile_id)
-		);
-		
-		$res = $this->dbh->fetchRow('SELECT * FROM users WHERE id=LAST_INSERT_ID()');
-		
-		return $res == null? null: new User($res);
-	}*/
-	
+	/*
 	public function save(){
 		$q = 'UPDATE users SET ';
 		$param = array();
@@ -88,7 +72,7 @@ class User extends Model{
 		$param[] = $this->id;
 		$q = substr($q, 0, strlen($q) - 2)." WHERE id=?";
 		$this->dbh->update($q, $param);
-	}
+	}*/
 	
 	public function is_authorized(){
 		return $this->is_auth;
@@ -133,8 +117,10 @@ class User extends Model{
 	}
 	
 	public function delete(){
-		$this->dbh->delete('DELETE FROM users, profiles USING users INNER JOIN profiles ON
-		 	profiles.id=users.id WHERE users.id=?',
+		$comments = new Comments();
+		$comments->deleteCommensByUserId($this->id);
+		$this->dbh->delete('DELETE FROM users, profiles, carts USING users, profiles, carts WHERE
+			users.profile_id=profiles.id AND carts.user_id=users.id AND users.id=?',
 			array($this->id));
 	}
 	
@@ -152,15 +138,34 @@ class User extends Model{
 		
 		return $DB_HEADER->fetchAll($q, $param);
 	}
+	
+	public static function getUsersByIds($ids){
+		GLOBAL $DB_HEADER;
+		
+		return $DB_HEADER->fetchAll('SELECT u.*, p.*, u.id FROM users as u, profiles as p WHERE u.profile_id = p.id AND u.id IN ('.implode(',',$ids).')');
+	}
+	
+	public static function getCount(){
+		GLOBAL $DB_HEADER;
+		$res = $DB_HEADER->fetchRow('SELECT COUNT(*) FROM users');
+		return $res['COUNT(*)'];
+	}
+	
+	public function addRating($product_id, $comment_id, $mark){
+		$comments = new Comments();
+		
+		if(!$comments->isVotedCommentId($product_id, $comment_id, $this->id)){
+			$user_id = $comments->getUserIdByCommentId($product_id, $comment_id);
+			$comments->addMark($product_id, $comment_id, $this->id, $mark);
+			$this->dbh->update('UPDATE users as u SET u.rating = u.rating + ('.$mark.') WHERE u.id=?', array($user_id));
+			
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public static function getMaxRating(){
+		
+	}
 }
-
-
-
-
-
-
-
-
-
-
-

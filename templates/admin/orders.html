@@ -1,0 +1,28 @@
+{% extends 'admin/index.html' %}
+
+{% block content %}
+	<table>
+		<tr>
+			<td>id</td>
+			<td>Фамилия: </td>
+			<td>Адрес: </td>
+			<td>Местонахождение: </td>
+		</tr>
+		{% for order in orders %}
+		<tr>
+			<td>{{ order.id }}</td>
+			<td>{{ order.fio }}</td>
+			<td>{{ order.destination_address }}</td>
+			<td>
+				{{ order.curent_address }}
+				<form action="/administration/edit/order/{{ order.id }}" method="POST">
+					<input type="hidden" name="redirect_to" value="/administration/orders/{{ pagination.curent }}">
+					<input type="submit" value="Изменить">
+				</form>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	
+	{% include 'pagination.html' %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "admin/categories.html" %}
+
+{% block subcontent %}
+	<form action="/administration/create/categoty" method="POST">
+		<input type="hidden" name="action" value="create">
+		<table>
+			{% include "forms/category.html" %}
+		</table>
+		<input type="submit" value="Создать">
+	</form>
+{% endblock %}

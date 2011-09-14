@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+
+{% block content %}
+	{% if carts|length > 0 %}
+		<table class="cart_info">
+			<tr>
+				<td>Дата</td>
+				<td>Колиство товаров</td>
+				<td>Стоимость</td>
+				<td>Местоположение</td>
+				<td>Статус</td>
+			</tr>
+			{% for cart in carts %}
+			<tr>
+				<td>{{ cart.date }}</td>
+				<td>{{ cart.count }}</td>
+				<td>{{ cart.cost }}</td>
+				<td>{{ cart.curent_address }}</td>
+				<td>{% if cart.state == 1 %}Доставлено{% else %} Доставка{% endif %}
+					<form action="/my_cart/history/cart/{{ cart.id }}" method="POST">
+						<input type="hidden" name="redirect_to" value="/my_cart/history/{{ pagination.curent }}">
+						<input type="submit" value="Подробнее">
+					</form>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% include 'pagination.html'%}
+	{% else %}
+		<label>Вы еще не делали ни одного заказа.</label>
+	{% endif %}
+	
+{% endblock %}

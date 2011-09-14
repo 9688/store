@@ -1,0 +1,36 @@
+{% extends 'admin/index.html' %}
+
+{% block content %}
+<form action="/administration/edit/order/{{ order.id }}" method="POST">
+	<input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+	<input type="hidden" name="action" value="save"> 
+	<table>
+		<tr>
+			<td>ID</td>
+			<td>{{ order.id }}</td>
+		</tr>
+		<tr>
+			<td>ИОФ: </td>
+			<td>{{ order.first_name }} {{ order.middle_name }} {{ order.last_name }}</td>
+		</tr>
+		<tr>
+			<td>Адрес: </td>
+			<td>{{ order.country }}, {{ order.city }}, {{ order.street }} {{ order_house_number }}-{{ order.apartament_number }}</td>
+		</tr>
+		<tr>
+			<td>Местоположение: </td>
+			<td><input type="text" name="curent_address" value="{{ order.curent_address }}"></td>
+		</tr>
+		<tr>
+			<td>Статус: </td>
+			<td>
+				<select name="state">
+					<option value="0" {% if order.state == 0 %} selected {% endif %}>Доставка</option>
+					<option value="1" {% if order.state == 1 %} selected {% endif %}>Доставлено</option>
+				</select>
+			</td>
+		</tr>
+	</table>
+	<input type="submit" value="Созранить">
+</form>
+{% endblock %}

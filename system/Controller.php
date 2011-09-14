@@ -45,26 +45,30 @@ class Controller {
 	function _forward($action, $controller = null, $module = null, $params = null) {
 		$this->request->setAction ( $action );
 		
-		if ($controller != null)
+		if ($controller !== null)
 			$this->request->setControllerName ( $controller );
 		
-		if ($module != null)
+		if ($module !== null)
 			$this->request->setModuleName ( $module.SEPARATOR.SEPARATOR );
 		
-		if ($params != null)
+		if ($params !== null)
 			$this->request->setParams ( $params );
 		
 		$this->request->processed ( false );
 	}
 	
-	function _redirect($url) {
+	function _redirect($url, $now=true) {
 		$this->getRequest()->processed(true);
 		header('Location: '.$url, false);
+		if($now)
+			exit(0);
 	}
 	
-	function _refresh(){
+	function _refresh($now = true){
 		$this->getRequest()->processed(true);
 		header('Refresh: 2');
+		if($now)
+			exit(0);
 	}
 	
 	function __call($name, $arguments) {

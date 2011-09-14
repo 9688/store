@@ -25,7 +25,7 @@ class Loader {
 		
 		$path = APLICATION_ROOT.$dir.$res['module'].$classname.'.php';
 		if (! in_array ( $path, Loader::$include_paths )) {
-			if (! include $path)
+			if (! require_once $path)
 				throw new Exception ( "file does't exist $path for class $classname" );
 			
 			Loader::$include_paths [] = $path;

@@ -1,76 +1,76 @@
-{% extends "admin/index.html" %}
+{% extends "admin/base.html" %}
 
 {% block content %}
 <table>
 	<tr>
 		<td>
-			{% if user.level_access > u.level_access and id != user.id %}
-				<a href="/administration/edit/user/{{ id }}">Изменить</a>
+			{% if (user.level_access > u.level_access or user.level_access == 3) and data.id != user.id %}
+				<a href="/administration/edit/user/{{ data.id }}">Изменить</a>
 			{% endif %}
 		</td>
 		<td>
-			{% if (user.level_access > u.level_access or user.level_access == 3) and id != user.id %}
-				<a href="/administration/delete/user/{{ id }}">Удалить</a>
+			{% if (user.level_access > u.level_access or user.level_access == 3) and data.id != user.id %}
+				<a href="/administration/delete/user/{{ data.id }}">Удалить</a>
 			{% endif %}
 		</td>
 	</tr>
 	<tr>
 		<td>Аватар: </td>
-		<td><img src="{{ avatar }}"></td>
+		<td><img src="{{ data.profile.avatar }}"></td>
 	</tr>
 	<tr>
 		<td>Логин: </td>
-		<td>{{ login }}</td>
+		<td>{{ data.login }}</td>
 	</tr>
 	<tr>
 		<td>Уровень доступа: </td>
 		<td>
-			{% if level_access == 1 %}
+			{% if data.level_access == 1 %}
 			Пользователь
 			{% endif %}
-			{% if level_access == 2 %}
+			{% if data.level_access == 2 %}
 			Модератор
 			{% endif %}
-			{% if level_access == 3 %}
+			{% if data.level_access == 3 %}
 			Администратор
 			{% endif %}
 		</td>
 	</tr>
 	<tr>
 		<td>Email: </td>
-		<td>{{ email }}</td>
+		<td>{{ data.profile.email }}</td>
 	</tr>
 	<tr>
 		<td>Имя: </td>
-		<td>{{ first_name }}</td>
+		<td>{{ data.profile.first_name }}</td>
 	</tr>
 	<tr>
 		<td>Отчество: </td>
-		<td>{{ middle_name }}</td>
+		<td>{{ data.profile.middle_name }}</td>
 	</tr>
 	<tr>
 		<td>Фамилия: </td>
-		<td>{{ last_name }}</td>
+		<td>{{ data.profile.last_name }}</td>
 	</tr>
 	<tr>
 		<td>Страна: </td>
-		<td>{{ country }}</td>
+		<td>{{ data.profile.country }}</td>
 	</tr>
 	<tr>
 		<td>Город: </td>
-		<td>{{ city }}</td>
+		<td>{{ data.profile.city }}</td>
 	</tr>
 	<tr>
 		<td>Улица: </td>
-		<td>{{ street }}</td>
+		<td>{{ data.profile.street }}</td>
 	</tr>
 	<tr>
 		<td>Номер дома: </td>
-		<td>{{ house_number }}</td>
+		<td>{{ data.profile.house_number }}</td>
 	</tr>
 	<tr>
 		<td>Номер квартиры: </td>
-		<td>{{ apartament_number }}</td>
+		<td>{{ data.profile.apartament_number }}</td>
 	</tr>
 </table>
 {% endblock %}

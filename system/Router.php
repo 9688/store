@@ -3,10 +3,12 @@
 class Action {
 	public $controller;
 	public $method;
+	public $params;
 	
-	function __construct($controller, $method) {
+	function __construct($controller, $method, $params = array()) {
 		$this->controller = $controller;
 		$this->method = $method;
+		$this->params = $params;
 	}
 	
 	function getController() {
@@ -15,6 +17,10 @@ class Action {
 	
 	function getMethod() {
 		return $this->method;
+	}
+	
+	function getParams(){
+		return $this->params;
 	}
 }
 
@@ -35,6 +41,7 @@ class Router {
 		$pattern_p = '';
 		
 		while ( is_array ( $next_p ) ) {
+			$find = false;
 			foreach ( $next_p as $key => $val ) {
 				$find = false;
 				$k = ereg_replace(':['.CONTENTS_OF_THE_PARAM_NAME.']+<', '(', $key);
@@ -51,10 +58,14 @@ class Router {
 				}
 			}
 			
-			if (! $find)
-				throw new Exception ( "route $pattern does not exist for $url", 0 );
+			if(!$find)
+				if(DEBUG)
+					throw new Exception ( "route $pattern does not exist for $url", 0 );
+				else
+					header('Location: /error_404', false);
 		}
 		
+				
 		ereg ( $pattern, $url, $vals );
 		$keys = array();
 		preg_match_all( '/:(['.CONTENTS_OF_THE_PARAM_NAME.']+)/', $pattern_p, $keys );
@@ -62,11 +73,11 @@ class Router {
 		ereg ( "$reg_dest_arg/$", $url, $action );
 		
 		$res = Loader::parse ( $next_p->getController () );
-		
 		$request->setModuleName ( $res ['module'] );
 		$request->setControllerName ( $res ['filename'] );
 		$request->setAction ( $next_p->getMethod () );
-		$params = array_combine ( $keys, array_slice ( $vals, 1 ) );
+		$request->setParams ( $next_p->getParams () );
+		$params = array_combine ( $keys, array_slice ( $vals, 1 , count($keys)) );
 		$request->setParams ( $params );
 	}
 }

@@ -1,0 +1,52 @@
+{% extends "index.html" %}
+
+{% block content %}
+	<table>
+		<tr>
+		<td>
+		<h2>{{ product.name }}</h2>
+		</td>
+		{% if not product.voted %}
+		<td>
+		<form action="/voted/product/{{ product.id }}/up">
+			<input type="hidden" name="redirect_to" value="/product/{{ product.id }}">
+			<input type="submit" value="+">
+		</form>
+		</td>
+		<td>
+		<form action="/voted/product/{{ product.id }}/down">
+			<input type="hidden" name="redirect_to" value="/product/{{ product.id }}">
+			<input type="submit" value="-">
+		</form>
+		</td>
+		{% endif %}
+		</tr>
+	</table>
+	<img src="{{ product.image }}"><br>
+	рейтинг:{%if product.mark %}{{ product.mark }}{% else %}0{% endif %}
+	
+	<div>
+		<h4>{{ product.cost }} руб.</h4>
+		{% if user.login %}
+		<form method="POST" action="/my_cart/add/{{ product.id }}">
+			Кол-во: <input type="number" name="count" value="1">
+			<input type="submit" value="В корзину">
+			<input type="hidden" name="redirect_to" value="/product/{{ product.id }}">
+		</form>
+		{% endif %}
+	</div>
+	<span>{{ product.info }}</span>
+	<div id="comments">
+		{% include "tree_comments.html" %}
+		{% if user.login %}
+			<a class="comment-button" href="/product/{{ product.id }}/add/comment/{{ parent_id|default(0) }}">Добавить коментарий</a>
+		{% endif %}
+		<hr>	
+
+		
+		{% if action == 'add-comment' %}
+			{% include 'add_comment.html' %}
+		{% endif %}
+	</div>	
+	</div>
+{% endblock %}

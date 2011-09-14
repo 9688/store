@@ -1,0 +1,8 @@
+<ul>
+	{% for category in category.subcategories %}
+		<li>
+		<a href="{{ category.link }}/1">{{ category.name }}</a>
+		{% include 'tree_categories.html' %}
+		</li>
+	{% endfor %}
+</ul>

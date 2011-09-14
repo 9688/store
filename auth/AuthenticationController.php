@@ -1,12 +1,13 @@
 <?php
 require_once 'auth/Profile.php';
 require_once 'auth/User.php';
+require_once 'cart/Cart.php';
 
 class AuthenticationController extends Controller{
 	
 	public function registrationAction(){	
 		if($this->getRequest()->user->is_authorized())
-			$this->_redirect('/');
+			$this->_redirect('/error_404');
 		
 		$this->getResponce()->setTemplate('auth/registration.html');
 				
@@ -21,6 +22,12 @@ class AuthenticationController extends Controller{
 				$profile = $profile->create();
 				$user->profile_id = $profile->id;
 				$user = $user->create();
+				
+				$cart = new Cart(array(
+					'user_id' => $user->id,
+					'state' => Cart::PREPARE
+				));
+				$cart->create();
 
 				session_start();
 				$_SESSION['user_id'] = $user->id;
@@ -32,13 +39,17 @@ class AuthenticationController extends Controller{
 				$this->getResponce()->setParams($this->getRequest()->getParams());
 			}		
 		}
-		elseif($this->getRequest()->getParam('action') == 'fill_profile')
+		elseif($this->getRequest()->getParam('action') == 'fill_profile'){
 			$this->_forward('fill', 'ProfileController');
+			return;
+		}
+		
+		$this->_forward('initPage', 'IndexController', '');
 	}
 	
 	public function loginAction(){
 		if($this->getRequest()->user->is_authorized())
-			$this->_redirect('/');
+			$this->_redirect('/error_404');
 
 		$user = User::getByLogin($this->getRequest()->POST['login']);
 			
@@ -64,6 +75,9 @@ class AuthenticationController extends Controller{
 			$r = setcookie('sid', '', 0, '/');
 		
 		$this->_redirect('/');
+	}
+	
+	public function postDispath(){
 	}
 }
 

@@ -1,6 +1,16 @@
-{% extends "admin/index.html" %}
+{% extends "admin/base.html" %}
+
+{% block navigation %}
+	<ul>
+		<li><a href="/administration/users/all/1">Все</a></li>
+		<li><a href="/administration/users/buyers/1">Покупатели</a></li>
+		<li><a href="/administration/users/moders/1">Модераторы</a></li>
+		<li><a href="/administration/users/admins/1">Администраторы</a></li>
+	</ul>
+{% endblock %}
 
 {% block content %}
+
 	{% if users %}
 		<table>
 			<tr>
@@ -14,17 +24,12 @@
 			<tr>
 				<td>{{ u.login }}</td>
 				<td>{{ u.level_access }}</td>
-				<td><a href="/administration/info/user/{{u.id }}">Подробнее</a></td>
-				{% if user.level_access > u.level_access %}
-				<td>
-					<a href="/administration/edit/user/{{ u.id }}">Изменить</a>
-				</td>
-				{% endif %}
+				<td><a href="/administration/info/user/{{u.id }}">Подробнее</a>
 				{% if (user.level_access > u.level_access or user.level_access == 3) and u.id != user.id %}
-				<td>
+					<a href="/administration/edit/user/{{ u.id }}">Изменить</a>
 					<a href="/administration/delete/user/{{ u.id }}">Удалить</a>
-				</td>
 				{% endif %}
+				</td>
 			</tr>
 			{% endfor %}
 		</table>

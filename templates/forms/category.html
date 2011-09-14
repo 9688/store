@@ -1,0 +1,19 @@
+			<tr>
+				<td>Родительская категория: </td>
+				<td>
+					<select name="parent">
+						{% include "admin/select_category.html" %}
+					</select>
+				</td>
+				<td>{{ error.parent }}</td>
+			</tr>
+			<tr>
+				<td>Название: </td>
+				<td><input type="text" name="name" maxlength="256" required value="{{ name }}"></td>
+				<td>{{ error.name }}</td>
+			</tr>
+			<tr>
+				<td>Ссылка: </td>
+				<td><input type="text" name="link" maxlength="256" required value="{{ link }}"></td>
+				<td>{{ error.link }}</td>
+			</tr>

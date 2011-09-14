@@ -1,0 +1,54 @@
+<ul>
+	{% for comment in comment.comments %}
+		<li>
+			{% if comment.user.rating < -5 %}
+				<div class="comment bade">
+			{% endif %}
+			{% if comment.user.rating > 5 %}
+				<div class="comment good">
+			{% endif %}
+			
+			{% if comment.user.rating <= 5 and comment.user.rating >= -5 %}
+			<div class="comment">
+			{% endif %}
+				<div class="meta">
+					<table>
+						<tr>
+							<td>
+								<img width="25" height="25" src="/media/avatars/{{ comment.user.avatar }}">
+								<label>{{ comment.user.login }}({{ comment.user.rating }}), </label>	
+								<span class="date">{{ comment.date }}</span>					
+							</td>
+							{% if not comment.appraise %}
+								<td>
+									<form action="/comment/{{ comment.id }}/up" method="POST">
+										<input type="hidden" name="product_id" value="{{ product.id }}">
+										<input type="hidden" name="redirect_to" value="/product/{{ product.id }}">
+										<input type="submit" value="+">
+									</form>
+								</td>
+								<td>
+									<form action="/comment/{{ comment.id }}/down" method="POST">
+										<input type="hidden" name="product_id" value="{{ product.id }}">
+										<input type="hidden" name="redirect_to" value="/product/{{ product.id }}">
+										<input type="submit" value="-">
+									</form>
+								</td>
+							{% endif %}
+							{% if user.login %}
+								<td>
+									<a class="comment-button" href="/product/{{ product.id }}/add/comment/{{ comment.id}}">Коментировать</a>
+								</td>
+							{% endif %}	
+						</tr>
+					</table>
+					
+				</div>
+				<div class="content">
+					{{ comment.text }}<br>
+				</div>
+			</div>
+			{% include 'tree_comments.html' %}
+		</li>
+	{% endfor %}
+</ul>

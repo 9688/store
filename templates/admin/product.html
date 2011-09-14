@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+{% if redirect_to %}
+	<a href="{{ redirect_to }}">Назад</a>
+{% endif%}
+<table>
+  <tr>
+    <td>Категория: </td>
+    <td>{{ product.category.name }}</td>
+  </tr>
+  <tr>
+    <th>Название: </th>
+    <th>{{ product.name }}</th>
+  </tr>
+  <tr>
+    <td>Картинка: </td>
+    <td><img src="{{ product.image }}"></td>
+  </tr>
+  <tr>
+    <td>Описание: </td>
+    <td>{{ product.info }}</td>
+  </tr>
+  <tr>
+  	<td>Цена: </td>
+  	<td>{{ product.cost }} руб</td>
+  </tr>
+</table>
+<a href="/administration/edit/product/{{ product.id }}">Изменить</a>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% for category in category.subcategories %}
+	{% if not id or id != category.id %}
+		{% if parent == category.id %}
+			<option value="{{ category.id }}" selected >{{ category.name }}</option>
+		{% else %}
+			<option value="{{ category.id }}">{{ category.name }}</option>
+		{% endif %}
+	{% include "admin/select_category.html" %}
+	{% endif %}
+{% endfor %}

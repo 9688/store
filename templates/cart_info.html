@@ -1,0 +1,31 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<a href="{{ redirect_to }}">назад</a>
+	<table class="cart_info">
+		<tr>
+			<td>№</td>
+			<td>Наименование</td>
+			<td>Кол-во</td>
+			<td>Цена</td>
+		</tr>
+		{% for shop in shoping %}
+		<tr>
+			<td>{{ loop.index }}</td>
+			<td>
+				<img width="50" height="50" src="{{ shop.image }}">
+				<label>{{ shop.name }}</label>
+			</td>
+			<td>
+				<label>{{ shop.count }}</label>
+			</td>
+			<td>
+				<label>{{ shop.cost }}</label>
+			</td>
+		</tr>
+		{% endfor %}	
+	</table>
+	<hr>
+	Итого:
+	{{ total.cost }} руб.
+{% endblock %}

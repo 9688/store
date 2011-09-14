@@ -1,0 +1,13 @@
+article #tree_categories ul {
+  list-style: none; }
+  article #tree_categories ul li form {
+    float: left;
+    display: inline; }
+article table {
+  border-collapse: collapse; }
+  article table td {
+    border: solid 1px black; }
+    article table td table td {
+      border: none; }
+article #tree_categories td {
+  border: none; }

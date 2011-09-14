@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+{% block head %}
+	<script type="text/javascript" src="/static/js/grabber.js"></script>
+</script>
+{% endblock %}
+{% block content %}
+	<form action="/grabber/grab" method="POST">
+		<select name="category_id">
+			<option value="-1" selected>NULL</option>
+			{% for cat in categories %}
+				{% if cat.id != 1 %}
+					{% if product.category_id == cat.id %}
+						<option value="{{ cat.id }}" selected onClick="setCat({{ cat.id }})">{{ cat.name }}</option>
+					{% else %}
+						<option value="{{ cat.id }}" onClick="setCat({{ cat.id }})">{{ cat.name }}</option>
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		</select><br>
+		COUNT:<input type="text" name="count"><br>
+		PREFIXNAME: <input type="text" name="prefix_name" value="product"><br>
+		<input type="submit">
+	</form>
+{% endblock %}

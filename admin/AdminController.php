@@ -1,29 +1,14 @@
 <?php
 require_once 'auth/User.php';
+require_once 'category/Product.php';
 
-define('COUNT_USERS_ON_PAGE', 4);
+define('COUNT_USERS_ON_PAGE', 20);
 
 class AdminController extends Controller{
 	
 	public function preDispath(){
 		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access < User::MODER)
 			$this->_redirect(HTTP_404);
-		
-		$this->getResponce()->setParam('category', array(
-			'link' => '',
-			'name' => '',
-			'subcaterories' => array(
-				array(
-					'name' => 'Пользователи',
-					'link' => '/administration/users/all/1',
-					'subcaterories' => array(
-						array('name' => 'Покупатели', 'link' => '/administration/users/buyers/1'),
-						array('name' => 'Модераторы', 'link' => '/administration/users/moders/1'),
-						array('name' => 'Администраторы', 'link' => '/administration/users/admins/1')
-					)
-				)
-			)
-		));
 	}
 	
 	public function showListUsersAction(){
@@ -65,9 +50,6 @@ class AdminController extends Controller{
 	}
 	
 	public function createUserAction(){
-		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access <= User::BUYER)
-			$this->_redirect('/');
-		
 		$this->getResponce()->setTemplate('admin/create_user.html');
 		
 		if($this->getRequest()->getParam('action') == 'create'){
@@ -92,15 +74,22 @@ class AdminController extends Controller{
 				$error = array_merge($error, $profile->errors);
 			
 			if(count($error) == 0){
-				if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name']))
+				if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name'])){
 					$profile->avatar = upload($this->getRequest()->FILES['avatar'], null, AVATAR_DIR);
+					resizeImg($profile->avatar, AVATAR_DIR, 50, 50);
+				}
 				else
 					$profile->avatar = DEFAULT_AVATAR;
 
 				$profile = $profile->create();
 				$user->profile_id = $profile->id;
 				$user->password = sha1($user->password);
-				$user->create();
+				$user = $user->create();
+				$cart = new Cart(array(
+					'user_id' => $user->id,
+					'state' => Cart::PREPARE
+				));
+				$cart->create();
 				$this->getResponce()->setTemplate('msg.html');
 				$this->getResponce()->setParam('text', 'Пользователь успешно создан.');
 			}
@@ -115,9 +104,8 @@ class AdminController extends Controller{
 	
 	public function editUserAction(){
 		
-		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access < User::MODER ||
-		$this->getRequest()->user->id == $this->getRequest()->getParam('user_id'))
-			$this->_redirect('/');
+		if($this->getRequest()->user->id == $this->getRequest()->getParam('user_id'))
+			$this->_redirect('/error_404');
 		
 		$user = User::getById($this->getRequest()->getParam('user_id'));
 		if($user == null){
@@ -138,7 +126,7 @@ class AdminController extends Controller{
 			$post = $this->getRequest()->POST;
 			
 			if($u->level_access < User::BUYER || $u->level_access > User::ADMIN){
-				$this->_redirect('/');
+				$this->_redirect('/error_404');
 				return;
 			}
 			
@@ -169,7 +157,8 @@ class AdminController extends Controller{
 			if(count($error) == 0){
 				if(is_uploaded_file($this->getRequest()->FILES['avatar']['tmp_name'])){
 					$newprofile->avatar = upload($this->getRequest()->FILES['avatar'], null, AVATAR_DIR);
-					if($profile->avatar != null && Profile::getCountProfilesLinkingToAvatar($profile->avatar) == 1)
+					resizeImg($newprofile->avatar, AVATAR_DIR, 50, 50);
+					if($profile->avatar !== $newprofile->avatar && Profile::getCountProfilesLinkingToAvatar($profile->avatar) == 1)
 						unlink(MEDIA_ROOT.AVATAR_DIR.'/'.$profile->avatar);
 				}
 				else
@@ -184,29 +173,27 @@ class AdminController extends Controller{
 				$this->getResponce()->setParam('text', 'Данные пользователя успешно изменены.');
 			}
 			else{
+				$this->getResponce()->setParam($this->getRequest()->getParams());
 				$this->getResponce()->setParams(array_merge(
-					$this->getRequest()->getParams(),
-					array('error' => $error, 'id' => $user->id))
+					array('error' => $error), get_object_vars($user), get_object_vars($profile))
 				);
 			}
 		}
-		else{
+		else
 			$this->getResponce()->setParams(array_merge(
 				get_object_vars($profile),
 				get_object_vars($user)
 			));
-		}
 		
 		$this->getResponce()->setParam('avatar', AVATAR_URL.'/'.$profile->avatar);
 	}
 	
 	public function deleteUserAction(){
-		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access <= User::BUYER ||
-		$this->getRequest()->getParam('user_id') == null)
-			$this->_redirect('/');
+		if($this->getRequest()->getParam('user_id') == null)
+			$this->_redirect('/error_404');
 
 		if($this->getRequest()->user->id == $this->getRequest()->getParam('user_id'))
-			$this->_redirect('/');
+			$this->_redirect('/error_404');
 			
 		$user = User::getById($this->getRequest()->getParam('user_id'));
 		$this->getResponce()->setTemplate('msg.html');
@@ -214,17 +201,16 @@ class AdminController extends Controller{
 		if($user == null)
 			$this->getResponce()->setParam('text', 'Данный пользователь не существует.');
 		else{
+			if(Profile::getCountProfilesLinkingToAvatar($user->profile->avatar) == 1)
+				unlink(MEDIA_ROOT.AVATAR_DIR.'/'.$user->profile->avatar);
+				
 			$user->delete();
 			$this->getResponce()->setParam('text', 'Пользователь успешно удален.');	
 		}
 	}
 	
 	public function showUserInfoAction(){
-		if(!$this->getRequest()->user->is_authorized() || $this->getRequest()->user->level_access < User::MODER)
-			$this->_redirect('/');
-			
 		$user = User::getById($this->getRequest()->getParam('user_id'));
-		
 		
 		if($user == null){
 			$this->getResponce()->setTemplate('msg.html');
@@ -234,11 +220,31 @@ class AdminController extends Controller{
 			$profile = $user->profile;
 			$profile->avatar = AVATAR_URL.'/'.$profile->avatar;
 			$this->getResponce()->setTemplate('admin/user.html');
-			$this->getResponce()->setParams(array_merge(get_object_vars($user), get_object_vars($profile)));	
+			
+			$this->getResponce()->setParams(array(
+				'data' => get_object_vars($user),
+				'data.profile' => get_object_vars($profile),
+			));	
 		}
 	}
 	
 	public function indexAction(){
 		$this->getResponce()->setTemplate('admin/index.html');
+	}
+	
+	public function showListProductAction(){
+		$id = $this->getRequest()->getParam('id');
+		$id = $id == null? 1: $id;
+		
+		$list = Product::getProductsByCategoryId($id); 
+		if($list != null){
+			$this->getResponce()->setTemplate('admin/products.html');
+			$this->getResponce()->setParam('products', $list);
+		}
+		else{
+			$this->getResponce()->setTemplate('msg.html');
+			$this->getResponce()->setParam('text', 'Такой категории больше не существует.');
+		}
+			
 	}
 }

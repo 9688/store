@@ -1,0 +1,22 @@
+{% macro pagination(prefix, postfix, count, curent_page, count_page) %}
+{% if count > 1 %}
+	{% if curent_page - count_page / 2 < 1 %}
+		{% set start as 1 %}
+	{% else %}
+		{% set start as curent_page - count_page / 2 + start %}
+	{% endif %}
+	
+	{% if start + count_page < count %}
+		{% set end as start + count_page %}
+	{% else %}
+		{% set end as count %} 
+	{% endif %}
+
+	{% for i in start..end %}
+		{% if curent_page == i %}
+			<span>{{ i }}</span>
+		{% else %}
+			<a href="{{ prefix }}{{ i }}{{ postfix }}">{{ i }}</a>
+		{% endif %}
+	{% endfor %}
+{% endif %}

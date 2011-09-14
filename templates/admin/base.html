@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="/static/adminstyle.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/js/jgrid/css/ui.jqgrid.css"/>
+	<script type="text/javascript" src="/static/js/jgrid/js/jquery-1.5.2.min.js"></script>
+	<script type="text/javascript" src="/static/js/jgrid/js/jquery.jqGrid.min.js"></script>
+	<script type="text/javascript" src="/static/js/grid.js"></script>
+{% endblock %}
+
+{% block categories %}
+	<ul>
+		<li><a href="/administration/users/all/1">Пользователи</a></li>
+		<li><a href="/administration/categories">Категории</a></li>
+		<li><a href="/administration/products/1">Товары</a></li>
+		<li><a href="/administration/orders/1">Заказы</a>
+	</ul>
+{% endblock %}

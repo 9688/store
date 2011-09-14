@@ -1,9 +1,5 @@
 <?php
-class errorController extends Controller{
-	public function notFoundAction(){
-		$this->getResponce()->setTemplate('404.html');
-	}
-	
+class errorController{
 	public static function addError($text){
 		if(!DEBUG){
 			$f = fopen(ERROR_LOG_FILE, 'a');

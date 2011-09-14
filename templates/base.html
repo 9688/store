@@ -5,16 +5,24 @@
 <meta lang="ru">
 <title>Кофе</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+{% block head %}{% endblock %}
 </head>
 <body>
 <div id="container">
 	<header>
+		<a href="/"><img src="/static/images/header.jpg" width="150"></a>
 		<div>
 			{% if user.login %}
 				<p>
-					<img src="{{ user.avatar }}" alt="avatar">
+					<img src="{{ user.profile.avatar }}" alt="avatar">
 					Вы вошли как: {{ user.login }}<br>
-					<a href="/edit/profile">Изменить профиль</a>
+					Ваш рейтинг: {{ user.rating }}<br>
+					<a href="/edit/profile">Изменить профиль</a><br />
+					{% if user.login and user.level_access > 1 %}
+						<a href="/administration">АДМИНКА</a>
+						<a href="/grabber">hhhhhhh</a>
+					{% endif %}
+					<a href="/my_cart">Корзина</a><label>{{ user.cart.count }}</label>
 				</p>
 				
 				<form action="/logout" method="POST">
@@ -40,26 +48,19 @@
 			{% endif %}
 		</div>
 	</header>
-	<nav id="main">
-		<a href="/">ГЛАВНАЯ</a>
-		<a href="#">КОФЕ</a>
-		<a href="#">ЧАЙ</a>
-		<a href="#">ПОСУДА</a>
-		<a href="#">ОБОРУДОВАНИЕ</a>
-		{% if user.login and user.level_access > 1 %}
-			<a href="/administration">АДМИНКА</a>
-		{% endif %}
-		
-	</nav>
 	<nav id="categories">
-		{% include "categories.html" %}
+		{% block categories %}
+		{% endblock %}
 	</nav>
 	<article>
+	<div id="navigation">
+	{% block navigation %}
+	{% endblock %}
+	</div>
 	{% block content %}
 	{% endblock %}
 	</article>
 	<footer>
-		интерентт магазин
 	</footer>
 </div>
 </body>

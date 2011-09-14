@@ -1,9 +1,37 @@
 {% extends "base.html" %}
 
-{% block left_sidebar %}
-		<ul>
-			<li>1</li>
-			<li>2</li>
-			<li>3</li>
-		</ul>
+{% block categories %}
+	{% include 'tree_categories.html' %}
+{% endblock %}
+
+{% block navigation %}
+	{% for name in path_name %}
+		<label>{{ name }}</label> {% if not loop.last %}->{% endif %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+	{% if products|length == 0 %}
+		Список товаров пуст.
+	{% endif %}
+	{% for product in products %}
+		<div class="product">
+			<div class="title">
+			<a href="/product/{{ product.id }}">{{ product.name }}
+			</div>
+			<div class="image">
+				<img src="/media/images/{{ product.image }}"></a>
+			</div>
+			<b>{{ product.cost }} руб.</b><br>
+			{% if user.login %}
+			<form action="/my_cart/add/{{ product.id }}" method="POST">
+				<input type="hidden" name="redirect_to" value="{{ pagination.url }}/{{ pagination.curent }}">
+				<input type="submit" value="В корзину">
+			</form>
+			{% endif %}
+		</div>
+	{% endfor %}
+	<div class="pagination">
+		{% include 'pagination.html' %}
+	</div>
 {% endblock %}

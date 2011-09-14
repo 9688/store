@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+	
+	<form action="{{ link }}" method="POST" enctype="multipart/form-data">
+		
+		<input type="hidden" name="action" value="create">
+		<input type="hidden" name="redirect_to" value="{{ redirect_to|default('/administration/products') }}">
+		<table>
+			<tr>
+				<td>Категория: </td>
+				<td>
+					<select name="category_id">
+						<option value="-1">NULL</option>
+						{% for cat in categories %}
+							{% if cat.id != 1 %}
+								{% if category_id == cat.id %}
+									<option value="{{ cat.id }}" selected >{{ cat.name }}</option>
+								{% else %}
+									<option value="{{ cat.id }}" >{{ cat.name }}</option>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+					</select>				
+				</td>
+				<td>{{ error.category_id }}</td>
+			</tr>
+			{% include 'forms/product.html' %}
+		</table>
+		<input type="submit" value="Создать">
+	</form>
+{% endblock %}

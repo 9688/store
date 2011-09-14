@@ -1,0 +1,19 @@
+{% if pagination.pages|length > 1 %}
+	
+	{% for i in pagination.pages %}
+		{% if loop.first and pagination.start %}
+			<a href="{{ pagination.url }}/{{ pagination.start }}">в начало</a>
+		{% endif %}
+		
+		{% if i == pagination.curent %}
+			<span>{{ i }}</span>
+		{% else %}
+			<a href="{{ pagination.url }}/{{ i }}">{{ i }}</a>
+		{% endif %}
+		
+		{% if loop.last and pagination.end %}
+			<a href="{{ pagination.url }}/{{pagination.end }}">в конец</a>
+		{% endif %}
+	{% endfor %}
+	
+{% endif %}

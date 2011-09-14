@@ -1,0 +1,20 @@
+			<tr>
+				<td>Название: </td>
+				<td><input type="text" name="name" value="{{ name }}"></td>
+				<td>{{ error.name }}</td>
+			</tr>
+			<tr>
+				<td>Описание: </td>
+				<td><textarea name="info">{{ info }}</textarea></td>
+				<td>{{ error.info }}</td>
+			</tr>
+			<tr>
+				<td>Цена: </td>
+				<td><input type="text" name="cost" value="{{ cost }}"></td>
+				<td>{{ error.cost }}</td>
+			</tr>
+			<tr>
+				<td>Фото: </td>
+				<td><input type="file" name="image"></td>
+				<td>{{ error.image }}</td>
+			</tr>

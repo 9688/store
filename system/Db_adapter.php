@@ -1,4 +1,12 @@
 <?php
+
+require_once 'errorController.php';
+function db_exception($exception){
+	errorController::addError($exception);
+}
+
+set_exception_handler('db_exception');
+
 class Db_adapter {
 	const FETCH_ASSOC = PDO::FETCH_ASSOC;
 	const FECTH_NUM = PDO::FETCH_NUM;

@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+
+{% block navigation %}
+	<ul>
+		{% for cat in categories %}
+			<li><a href="/administration/products{{ cat.link }}/1">{{ cat.name }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}
+
+{% block content %}
+	<h3>{{ category.name }}</h3>
+	{% if products|length > 0 %}
+	<table id="products">
+		<tr>
+			<td>id</td>
+			<td>Название</td>
+			<td>Категория</td>
+			<td>Действия</td>
+		</tr>
+		{% for p in products %}
+		<tr>
+			<td>{{ p.id }}</td>
+			<td>{{ p.name }}</td>
+			<td>{{ p.category }}</td>
+			<td>
+				<table>
+					<tr>
+						<td>
+							<form action="/administration/info/product/{{ p.id }}" method="POST">
+								<input type="hidden" name="redirect_to" value="{{ curent_url }}">
+								<input type="submit" value="Подробнее">
+							</form>
+						</td>
+						<td>
+							<form action="/administration/edit/product/{{ p.id }}" method="POST">
+								<input type="hidden" name="redirect_to" value="{{ curent_url }}">
+								<input type="submit" value="Изменить">
+							</form>
+						</td>
+						<td>
+							<form action="/administration/delete/product/{{ p.id }}" method="POST">
+								<input type="hidden" name="redirect_to" value="{{ curent_url }}">
+								<input type="submit" value="Удалить">
+							</form>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>	
+		{% endfor %}
+	</table>
+		<div class="pagination">
+			{% include "pagination.html" %}
+		</div>
+	{% else %}
+		<label>Список товаров пуст.</label>
+	{% endif %}
+	<form action="{{ create_link }}" method="POST">
+		<input type="hidden" name="redirect_to" value="{{ curent_url }}">
+		<input type="submit" value="Добавить">	
+	</form>
+{% endblock %}

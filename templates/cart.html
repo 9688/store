@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+
+{% block content %}
+	<a href="/my_cart/history/1">История покупок</a><br>
+	{% if shoping|length != 0 %}
+	<form action="/my_cart/refresh" method="POST">
+	<table>
+		{% include 'forms/cart.html' %}
+	</table>
+	<a href="/my_cart/order">Оформить заказ</a>
+	<input type="submit" value="Пересчитать">
+	<a href="/my_cart/erase">Очистить корзину</a>
+	</form>
+	
+	{% else %}
+	<label>Ваша корзина пуста</label>
+	{% endif %}
+	
+{% endblock %}
